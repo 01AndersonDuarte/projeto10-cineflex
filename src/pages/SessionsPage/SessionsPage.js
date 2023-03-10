@@ -5,61 +5,58 @@ import styled from "styled-components";
 
 export default function SessionsPage() {
     const { id } = useParams();
-    const [filmeEscolhido, setFilmeEscolhido] = useState();
-    useEffect(()=>{
+    const [filmeEscolhido, setFilmeEscolhido] = useState(null);
+
+    useEffect(() => {
         const url = `https://mock-api.driven.com.br/api/v8/cineflex/movies/${id}/showtimes`;
         const promise = axios.get(url);
-        promise.then((resposta)=>{
+        promise.then((resposta) => {
             setFilmeEscolhido(resposta.data);
             console.log(resposta.data);
         });
-        promise.catch((resposta)=>{
+        promise.catch((resposta) => {
             console.log(resposta.response)
         });
     }, []);
+    if(filmeEscolhido===null){
+        return (
+            <PageContainer>
+                <div>
+                    Carregando...
+                </div>
+            </PageContainer>
+        );
+    }
 
     return (
         <PageContainer>
             Selecione o horário
             <div>
-                <SessionContainer>
-                    Sexta - 03/03/2023
-                    <ButtonsContainer>
-                        <button>14:00</button>
-                        <button>15:00</button>
-                    </ButtonsContainer>
-                </SessionContainer>
-
-                <SessionContainer>
-                    Sexta - 03/03/2023
-                    <ButtonsContainer>
-                        <button>14:00</button>
-                        <button>15:00</button>
-                    </ButtonsContainer>
-                </SessionContainer>
-
-                <SessionContainer>
-                    Sexta - 03/03/2023
-                    <ButtonsContainer>
-                        <button>14:00</button>
-                        <button>15:00</button>
-                    </ButtonsContainer>
-                </SessionContainer>
+                {filmeEscolhido.days.map((filme)=><Sessao key={filme.date} filme={filme}/>)}
             </div>
 
             <FooterContainer>
                 <div>
-                    <img src={"https://br.web.img2.acsta.net/pictures/22/05/16/17/59/5165498.jpg"} alt="poster" />
+                    <img src={filmeEscolhido.posterURL} alt="poster" />
                 </div>
                 <div>
-                    <p>Tudo em todo lugar ao mesmo tempo</p>
+                    <p>{filmeEscolhido.title}</p>
                 </div>
             </FooterContainer>
 
         </PageContainer>
     )
 }
-
+function Sessao({filme}) {
+    return (
+        <SessionContainer>
+            {filme.weekday} {filme.date}
+            <ButtonsContainer>
+                {filme.showtimes.map((horarios)=><button key={horarios.id}>{horarios.name}</button>)}
+            </ButtonsContainer>
+        </SessionContainer>
+    );
+}
 const PageContainer = styled.div`
     display: flex;
     flex-direction: column;
