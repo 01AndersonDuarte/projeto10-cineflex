@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import styled from "styled-components";
 
+import Footer from "../../components/Footer";
+
 export default function SessionsPage() {
-    const { id } = useParams();
+    const { idFilme } = useParams();
     const [filmeEscolhido, setFilmeEscolhido] = useState(null);
 
     useEffect(() => {
-        const url = `https://mock-api.driven.com.br/api/v8/cineflex/movies/${id}/showtimes`;
+        const url = `https://mock-api.driven.com.br/api/v8/cineflex/movies/${idFilme}/showtimes`;
         const promise = axios.get(url);
         promise.then((resposta) => {
             setFilmeEscolhido(resposta.data);
@@ -18,7 +20,8 @@ export default function SessionsPage() {
             console.log(resposta.response)
         });
     }, []);
-    if(filmeEscolhido===null){
+
+    if (filmeEscolhido === null) {
         return (
             <PageContainer>
                 <div>
@@ -32,27 +35,27 @@ export default function SessionsPage() {
         <PageContainer>
             Selecione o horário
             <div>
-                {filmeEscolhido.days.map((filme)=><Sessao key={filme.date} filme={filme}/>)}
+                {filmeEscolhido.days.map((filme) => <Sessao key={filme.date} filme={filme} />)}
             </div>
-
-            <FooterContainer>
+            <Footer>
                 <div>
                     <img src={filmeEscolhido.posterURL} alt="poster" />
                 </div>
                 <div>
                     <p>{filmeEscolhido.title}</p>
                 </div>
-            </FooterContainer>
-
+            </Footer>
         </PageContainer>
     )
 }
-function Sessao({filme}) {
+function Sessao({ filme }) {
     return (
         <SessionContainer>
             {filme.weekday} {filme.date}
             <ButtonsContainer>
-                {filme.showtimes.map((horarios)=><button key={horarios.id}>{horarios.name}</button>)}
+                {filme.showtimes.map((horarios) => (
+                    <Link to={`/assentos/${horarios.id}`}><button key={horarios.id}>{horarios.name}</button></Link>
+                ))}
             </ButtonsContainer>
         </SessionContainer>
     );
@@ -89,43 +92,5 @@ const ButtonsContainer = styled.div`
     }
     a {
         text-decoration: none;
-    }
-`
-const FooterContainer = styled.div`
-    width: 100%;
-    height: 120px;
-    background-color: #C3CFD9;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    font-size: 20px;
-    position: fixed;
-    bottom: 0;
-
-    div:nth-child(1) {
-        box-shadow: 0px 2px 4px 2px #0000001A;
-        border-radius: 3px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: white;
-        margin: 12px;
-        img {
-            width: 50px;
-            height: 70px;
-            padding: 8px;
-        }
-    }
-
-    div:nth-child(2) {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        p {
-            text-align: left;
-            &:nth-child(2) {
-                margin-top: 10px;
-            }
-        }
     }
 `
