@@ -49,11 +49,11 @@ export default function SessionsPage() {
 }
 function Sessao({ filme }) {
     return (
-        <SessionContainer>
+        <SessionContainer data-test="movie-day">
             {filme.weekday} {filme.date}
             <ButtonsContainer>
                 {filme.showtimes.map((horarios) => (
-                    <Link key={horarios.id} to={`/assentos/${horarios.id}`}><button >{horarios.name}</button></Link>
+                    <Link key={horarios.id} to={`/assentos/${horarios.id}`}><button data-test="showtime">{horarios.name}</button></Link>
                 ))}
             </ButtonsContainer>
         </SessionContainer>

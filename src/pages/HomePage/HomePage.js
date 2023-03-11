@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 export default function HomePage() {
-    const [movies, setMovies] = useState([]);
+    const [movies, setMovies] = useState(null);
     useEffect(() => {
         const promise = axios.get("https://mock-api.driven.com.br/api/v8/cineflex/movies");
 
@@ -17,6 +17,14 @@ export default function HomePage() {
         });
     }, []);
 
+    if (movies === null) {
+        return (
+            <PageContainer>
+                Carregando...
+            </PageContainer>
+        );
+    }
+
     return (
         <PageContainer>
             Selecione o filme
@@ -24,7 +32,7 @@ export default function HomePage() {
             <ListContainer>
                 {movies.map((m) => (
                     <Link to={`/sessoes/${m.id}`} key={m.id}>
-                        <MovieContainer><img src={m.posterURL} alt="movie-poster" /></MovieContainer>
+                        <MovieContainer data-test="movie"><img src={m.posterURL} alt="movie-poster" /></MovieContainer>
                     </Link>
                 ))}
             </ListContainer>

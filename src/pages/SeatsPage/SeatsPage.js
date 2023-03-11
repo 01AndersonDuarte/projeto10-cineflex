@@ -7,10 +7,10 @@ import Footer from "../../components/Footer"
 export default function SeatsPage() {
     const { idSessao } = useParams();
     const [sessaoEscolhida, setSessaoEscolhida] = useState(null);
-    const [assentoEscolhido, setAssentoEscolhido] = useState({ids: [], name: "", cpf: ""});
-    const [numeroAssentos, setNumeroAssentos] = useState();
+    const [assentoEscolhido, setAssentoEscolhido] = useState({ ids: [], name: "", cpf: "" });
     const navigate = useNavigate();
     // console.log(assentoEscolhido);
+
     useEffect(() => {
         const url = `https://mock-api.driven.com.br/api/v8/cineflex/showtimes/${idSessao}/seats`;
         const promise = axios.get(url);
@@ -33,11 +33,11 @@ export default function SeatsPage() {
         evento.preventDefault();
         const url = "https://mock-api.driven.com.br/api/v8/cineflex/seats/book-many";
         const promise = axios.post(url, assentoEscolhido);
-        promise.then((resposta)=>{
+        promise.then((resposta) => {
             // console.log(resposta)
-            navigate("/sucesso", {state: {assento: assentoEscolhido, sessao: sessaoEscolhida}});
+            navigate("/sucesso", { state: { assento: assentoEscolhido, sessao: sessaoEscolhida } });
         });
-        promise.catch((erro)=>{
+        promise.catch((erro) => {
             console.log(erro.data)
         });
     }
@@ -67,22 +67,24 @@ export default function SeatsPage() {
             <FormContainer onSubmit={finalizar}>
                 Nome do Comprador:
                 <input
+                    data-test="client-name"
                     type="text"
                     placeholder="Digite seu nome..."
                     value={assentoEscolhido.name}
                     required
-                    onChange={(e)=>setAssentoEscolhido({...assentoEscolhido, name: e.target.value})}
+                    onChange={(e) => setAssentoEscolhido({ ...assentoEscolhido, name: e.target.value })}
                 />
 
                 CPF do Comprador:
                 <input
+                    data-test="client-cpf"
                     type="number"
                     placeholder="Digite seu CPF..."
                     value={assentoEscolhido.cpf}
                     required
-                    onChange={(e)=>setAssentoEscolhido({...assentoEscolhido, cpf: e.target.value})}
+                    onChange={(e) => setAssentoEscolhido({ ...assentoEscolhido, cpf: e.target.value })}
                 />
-                <button type="submit">Reservar Assento(s)</button>
+                <button data-test="book-seat-btn" type="submit">Reservar Assento(s)</button>
             </FormContainer>
 
             <Footer>
@@ -101,13 +103,14 @@ export default function SeatsPage() {
 function Assento({ assentoEscolhido, setAssentoEscolhido, assento }) {
     function adicionarAssento(bool, id, name) {
         setAssentoEscolhido(bool);
-        bool ? setAssentoEscolhido({...assentoEscolhido, ids: [...assentoEscolhido.ids, id]}) :
-        setAssentoEscolhido({...assentoEscolhido, ids: assentoEscolhido.ids.filter((a)=>a!==id)})
-        
+        bool ? setAssentoEscolhido({ ...assentoEscolhido, ids: [...assentoEscolhido.ids, id] }) :
+            setAssentoEscolhido({ ...assentoEscolhido, ids: assentoEscolhido.ids.filter((a) => a !== id) })
+
     }
     return (
         <>
             <SeatItem
+                data-test="seat"
                 onClick={() => (
                     assento.isAvailable ? (assentoEscolhido.ids.includes(assento.id) ? adicionarAssento(false, assento.id)
                         : adicionarAssento(true, assento.id)) : alert("Esse assento não está disponível")

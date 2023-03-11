@@ -13,29 +13,29 @@ export default function SuccessPage() {
         setNumeroAssentos(assento.ids.map((id)=>filme.seats.find(f=>f.id===id).name));
     }
     useEffect(gerarAssento, []);
-
+    
     return (
         <PageContainer>
             <h1>Pedido feito <br /> com sucesso!</h1>
 
-            <TextContainer>
+            <TextContainer data-test="movie-info">
                 <strong><p>Filme e sessão</p></strong>
                 <p>{filme.movie.title}</p>
                 <p>{filme.day.date} - {filme.name}</p>
             </TextContainer>
 
-            <TextContainer>
+            <TextContainer data-test="seats-info">
                 <strong><p>Ingressos</p></strong>
                 {numeroAssentos.map((n)=><AssentoComprado key={n} assentoNumero={n}/>)}
             </TextContainer>
 
-            <TextContainer>
+            <TextContainer data-test="client-info">
                 <strong><p>Comprador</p></strong>
                 <p>Nome: {assento.name}</p>
                 <p>CPF: {assento.cpf}</p>
             </TextContainer>
 
-            <Link to="/"><button>Voltar para Home</button></Link>
+            <Link to="/" data-test="go-home-btn"><button>Voltar para Home</button></Link>
         </PageContainer>
     )
 }
