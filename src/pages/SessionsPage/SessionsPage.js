@@ -14,7 +14,6 @@ export default function SessionsPage() {
         const promise = axios.get(url);
         promise.then((resposta) => {
             setFilmeEscolhido(resposta.data);
-            console.log(resposta.data);
         });
         promise.catch((resposta) => {
             console.log(resposta.response)
@@ -54,7 +53,7 @@ function Sessao({ filme }) {
             {filme.weekday} {filme.date}
             <ButtonsContainer>
                 {filme.showtimes.map((horarios) => (
-                    <Link to={`/assentos/${horarios.id}`}><button key={horarios.id}>{horarios.name}</button></Link>
+                    <Link key={horarios.id} to={`/assentos/${horarios.id}`}><button >{horarios.name}</button></Link>
                 ))}
             </ButtonsContainer>
         </SessionContainer>

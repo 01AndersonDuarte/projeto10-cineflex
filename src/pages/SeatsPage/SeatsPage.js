@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import axios from "axios";
 import styled from "styled-components"
 import Footer from "../../components/Footer"
@@ -7,17 +7,21 @@ import Footer from "../../components/Footer"
 export default function SeatsPage() {
     const { idSessao } = useParams();
     const [sessaoEscolhida, setSessaoEscolhida] = useState(null);
+    const [assentoEscolhido, setAssentoEscolhido] = useState({ids: [], name: "", cpf: ""});
+    const [numeroAssentos, setNumeroAssentos] = useState();
+    const navigate = useNavigate();
+    // console.log(assentoEscolhido);
     useEffect(() => {
         const url = `https://mock-api.driven.com.br/api/v8/cineflex/showtimes/${idSessao}/seats`;
         const promise = axios.get(url);
         promise.then((resposta) => {
-            console.log(resposta.data);
             setSessaoEscolhida(resposta.data);
         });
         promise.catch((resposta) => {
             console.log(resposta)
         });
     }, []);
+
     if (sessaoEscolhida === null) {
         return (
             <PageContainer>
@@ -25,13 +29,24 @@ export default function SeatsPage() {
             </PageContainer>
         );
     }
+    function finalizar(evento) {
+        evento.preventDefault();
+        const url = "https://mock-api.driven.com.br/api/v8/cineflex/seats/book-many";
+        const promise = axios.post(url, assentoEscolhido);
+        promise.then((resposta)=>{
+            // console.log(resposta)
+            navigate("/sucesso", {state: {assento: assentoEscolhido, sessao: sessaoEscolhida}});
+        });
+        promise.catch((erro)=>{
+            console.log(erro.data)
+        });
+    }
     return (
         <PageContainer>
             Selecione o(s) assento(s)
 
             <SeatsContainer>
-                {/* <Assento sessaoEscolhida={sessaoEscolhida}/> */}
-                {sessaoEscolhida.seats.map((a) => <Assento assento={a} />)}
+                {sessaoEscolhida.seats.map((a) => <Assento key={a.id} assentoEscolhido={assentoEscolhido} setAssentoEscolhido={setAssentoEscolhido} assento={a} />)}
             </SeatsContainer>
 
             <CaptionContainer>
@@ -49,14 +64,25 @@ export default function SeatsPage() {
                 </CaptionItem>
             </CaptionContainer>
 
-            <FormContainer>
+            <FormContainer onSubmit={finalizar}>
                 Nome do Comprador:
-                <input placeholder="Digite seu nome..." />
+                <input
+                    type="text"
+                    placeholder="Digite seu nome..."
+                    value={assentoEscolhido.name}
+                    required
+                    onChange={(e)=>setAssentoEscolhido({...assentoEscolhido, name: e.target.value})}
+                />
 
                 CPF do Comprador:
-                <input placeholder="Digite seu CPF..." />
-
-                <button>Reservar Assento(s)</button>
+                <input
+                    type="number"
+                    placeholder="Digite seu CPF..."
+                    value={assentoEscolhido.cpf}
+                    required
+                    onChange={(e)=>setAssentoEscolhido({...assentoEscolhido, cpf: e.target.value})}
+                />
+                <button type="submit">Reservar Assento(s)</button>
             </FormContainer>
 
             <Footer>
@@ -72,15 +98,22 @@ export default function SeatsPage() {
         </PageContainer>
     )
 }
-function Assento({ assento }) {
-    const [assentoEscolhido, setAssentoEscolhido] = useState(false);
+function Assento({ assentoEscolhido, setAssentoEscolhido, assento }) {
+    function adicionarAssento(bool, id, name) {
+        setAssentoEscolhido(bool);
+        bool ? setAssentoEscolhido({...assentoEscolhido, ids: [...assentoEscolhido.ids, id]}) :
+        setAssentoEscolhido({...assentoEscolhido, ids: assentoEscolhido.ids.filter((a)=>a!==id)})
+        
+    }
     return (
         <>
             <SeatItem
-                onClick={() => assento.isAvailable ? setAssentoEscolhido(true) : ``}
-                key={assento.id}
-                corFundo={assento.isAvailable ? (assentoEscolhido ? `#1AAE9E` : `#C3CFD9`) : `#FBE192`}
-                corBorda={assento.isAvailable ? (assentoEscolhido ? `#0E7D71` : `#7B8B99`) : `#F7C52B`}
+                onClick={() => (
+                    assento.isAvailable ? (assentoEscolhido.ids.includes(assento.id) ? adicionarAssento(false, assento.id)
+                        : adicionarAssento(true, assento.id)) : alert("Esse assento não está disponível")
+                )}
+                corFundo={assento.isAvailable ? (assentoEscolhido.ids.includes(assento.id) ? `#1AAE9E` : `#C3CFD9`) : `#FBE192`}
+                corBorda={assento.isAvailable ? (assentoEscolhido.ids.includes(assento.id) ? `#0E7D71` : `#7B8B99`) : `#F7C52B`}
             >
                 {assento.name}
             </SeatItem>
@@ -108,7 +141,7 @@ const SeatsContainer = styled.div`
     justify-content: center;
     margin-top: 20px;
 `
-const FormContainer = styled.div`
+const FormContainer = styled.form`
     width: calc(100vw - 40px); 
     display: flex;
     flex-direction: column;
