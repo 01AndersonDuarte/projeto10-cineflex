@@ -5,11 +5,11 @@ import styled from "styled-components";
 
 export default function HomePage() {
     const [movies, setMovies] = useState(null);
+    
     useEffect(() => {
         const promise = axios.get("https://mock-api.driven.com.br/api/v8/cineflex/movies");
 
         promise.then((resposta) => {
-            // console.log(resposta.data);
             setMovies(resposta.data)
         });
         promise.catch((resposta) => {

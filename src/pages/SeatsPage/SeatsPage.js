@@ -41,6 +41,20 @@ export default function SeatsPage() {
             console.log(erro.data)
         });
     }
+    function habilitarBotao() {
+        if ((assentoEscolhido.cpf.length <= 10) || (assentoEscolhido.name.length < 5)) {
+            return true;
+        }
+        return false;
+    }
+    function handleChange(event) {
+        const maxLength = 11;
+        const value = event.target.value;
+
+        if (value.length <= maxLength) {
+            setAssentoEscolhido({ ...assentoEscolhido, cpf: value })
+        }
+    }
     return (
         <PageContainer>
             Selecione o(s) assento(s)
@@ -82,9 +96,9 @@ export default function SeatsPage() {
                     placeholder="Digite seu CPF..."
                     value={assentoEscolhido.cpf}
                     required
-                    onChange={(e) => setAssentoEscolhido({ ...assentoEscolhido, cpf: e.target.value })}
+                    onChange={handleChange}
                 />
-                <button data-test="book-seat-btn" type="submit">Reservar Assento(s)</button>
+                <button data-test="book-seat-btn" type="submit" disabled={assentoEscolhido.ids.length === 0 ? true : habilitarBotao()}>Reservar Assento(s)</button>
             </FormContainer>
 
             <Footer>

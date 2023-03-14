@@ -32,7 +32,7 @@ export default function SuccessPage() {
             <TextContainer data-test="client-info">
                 <strong><p>Comprador</p></strong>
                 <p>Nome: {assento.name}</p>
-                <p>CPF: {assento.cpf}</p>
+                <p>CPF: {assento.cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4")}</p>
             </TextContainer>
 
             <Link to="/" data-test="go-home-btn"><button>Voltar para Home</button></Link>
